@@ -1,0 +1,29 @@
+main { max-width: 640px; margin: 0 auto; padding: 32px 16px; text-align: left; }
+h1 { margin-bottom: 4px; }
+h2 { font-size: 0.95rem; margin: 24px 0 8px; opacity: 0.8; text-transform: uppercase; letter-spacing: 0.05em; }
+.sub { opacity: 0.7; margin-top: 0; }
+.row { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { padding: 8px 14px; border-radius: 999px; border: 1px solid #4a7c59; background: transparent; color: inherit; cursor: pointer; }
+.chip.on { background: #4a7c59; color: #fff; }
+select, input[type="range"] { width: 100%; padding: 8px; }
+.go { margin-top: 28px; width: 100%; padding: 14px; border: 0; border-radius: 10px; background: #2e7d4f; color: #fff; font-size: 1rem; cursor: pointer; }
+.go:disabled { opacity: 0.5; cursor: not-allowed; }
+.player { margin-top: 24px; padding: 16px; border: 1px solid #4a7c59; border-radius: 10px; }
+.player audio { width: 100%; margin: 8px 0; }
+.error { color: #d9534f; }
+.num { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; margin-right: 8px; border-radius: 50%; background: #2e7d4f; color: #fff; font-size: 0.8rem; }
+.help { font-size: 0.85rem; opacity: 0.7; margin: 4px 0 10px; }
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 10px; }
+.card { padding: 12px; border: 1px solid #4a7c59; border-radius: 10px; cursor: pointer; display: flex; flex-direction: column; gap: 4px; }
+.card.on { background: rgba(74, 124, 89, 0.25); border-width: 2px; }
+.card .notes { font-family: monospace; color: #4a9c6a; }
+.card .meta { font-size: 0.78rem; opacity: 0.75; }
+.card .desc { font-size: 0.8rem; opacity: 0.9; flex: 1; }
+.mini { padding: 4px 8px; border-radius: 6px; border: 1px solid #4a7c59; background: transparent; color: inherit; cursor: pointer; font-size: 0.75rem; }
+.mini:hover { background: #4a7c59; color: #fff; }
+.callout { margin-top: 10px; padding: 12px 16px; border-left: 3px solid #2e7d4f; background: rgba(74, 124, 89, 0.12); border-radius: 0 8px 8px 0; }
+.callout ol { margin: 6px 0 0; padding-left: 20px; font-size: 0.9rem; }
+.player h3 { margin: 16px 0 6px; }
+.explain { margin-top: 10px; }
+.explain p { margin: 2px 0 0; font-size: 0.9rem; opacity: 0.85; }
+main { max-width: 860px; }

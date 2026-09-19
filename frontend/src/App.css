@@ -59,7 +59,10 @@ select, input[type="range"] { width: 100%; padding: 8px; accent-color: var(--gre
 
 /* Player */
 .player { margin-top: 24px; padding: 18px; border: 1.5px solid var(--line); border-radius: 16px; background: var(--card); box-shadow: var(--shadow); }
-.player audio { width: 100%; margin: 10px 0; }
+.controls { display: flex; align-items: center; gap: 10px; margin: 10px 0; }
+.controls audio { flex: 1; min-width: 0; }
+.stop { padding: 10px 16px; border: 0; border-radius: 999px; background: #c0392b; color: #fff; font-weight: 600; cursor: pointer; white-space: nowrap; }
+.stop:hover { filter: brightness(1.1); }
 .player a { color: var(--green); font-weight: 600; }
 .player h3 { margin: 18px 0 6px; color: var(--green); }
 .explain { margin-top: 10px; }
@@ -77,3 +80,9 @@ select, input[type="range"] { width: 100%; padding: 8px; accent-color: var(--gre
 @media (prefers-reduced-motion: reduce) {
   .band span, .notes-bg span, .eq.on i { animation: none; }
 }
+
+/* Scenario cards */
+.scenarios { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); }
+.scenario { text-align: left; color: var(--ink); font: inherit; }
+.scenario .icon { font-size: 2rem; line-height: 1; }
+.scenario .desc { font-size: 0.85rem; flex: 1; }

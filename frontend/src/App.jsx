@@ -72,6 +72,7 @@ export default function App() {
     setMood(key);
     setRaga(opts.moods[key].scale);
     setLayers(opts.moods[key].layers);
+    setTemplate(opts.moods[key].template);
   };
 
   const toggle = (l) =>
@@ -81,6 +82,14 @@ export default function App() {
     previewRef.current?.pause();
     previewRef.current = new Audio(`${API}/api/scale/${key}.wav?instrument=${instrument}`);
     previewRef.current.play();
+  };
+
+  const stop = () => {
+    const a = audioRef.current;
+    if (a) {
+      a.pause();
+      a.currentTime = 0;
+    }
   };
 
   const compose = async () => {
@@ -129,11 +138,15 @@ export default function App() {
           </div>
         </header>
 
-        <h2><span className="num">1</span> Pick a feeling</h2>
-        <div className="row">
+        <h2><span className="num">1</span> Pick a real-life scenario</h2>
+        <p className="help">Choose the moment you want music for. It sets a matching raga, tempo, instruments and method, which you can change below.</p>
+        <div className="cards scenarios">
           {Object.entries(opts.moods).map(([k, m]) => (
-            <button key={k} className={mood === k ? "chip on" : "chip"} onClick={() => pickMood(k)}>
-              {m.label}
+            <button key={k} className={mood === k ? "card scenario on" : "card scenario"} onClick={() => pickMood(k)}>
+              <span className="icon">{m.icon}</span>
+              <strong>{m.label}</strong>
+              <span className="desc">{m.story}</span>
+              <span className="meta">{opts.ragas[m.scale].name} · {m.bpm} bpm</span>
             </button>
           ))}
         </div>
@@ -207,9 +220,12 @@ export default function App() {
                 {opts.templates[track.template].name} · {track.bpm} bpm · seed {track.seed}
               </p>
             </div>
-            <audio ref={audioRef} controls src={`${API}${track.url}`}
-                   onPlay={() => setPlaying(true)} onPause={() => setPlaying(false)}
-                   onEnded={() => setPlaying(false)} />
+            <div className="controls">
+              <audio ref={audioRef} controls src={`${API}${track.url}`}
+                     onPlay={() => setPlaying(true)} onPause={() => setPlaying(false)}
+                     onEnded={() => setPlaying(false)} />
+              <button className="stop" onClick={stop} title="Stop and rewind to the start">⏹ Stop</button>
+            </div>
             <a href={`${API}${track.url}`} download>⬇️ Download WAV</a>
             <h3>🎧 What am I hearing?</h3>
             {track.explain.map((x) => (

@@ -33,7 +33,8 @@ class ComposeRequest(BaseModel):
 @app.get("/api/options")
 def options():
     return {
-        "moods": {k: {"label": m.label, "scale": m.scale, "bpm": m.bpm, "layers": m.layers}
+        "moods": {k: {"label": m.label, "scale": m.scale, "bpm": m.bpm, "layers": m.layers,
+                      "icon": m.icon, "story": m.story, "template": m.template}
                   for k, m in MOODS.items()},
         "ragas": {k: {kk: v[kk] for kk in ("name", "notes", "time", "feeling", "sound")}
                   for k, v in RAGAS.items()},

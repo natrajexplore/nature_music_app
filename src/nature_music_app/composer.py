@@ -25,17 +25,66 @@ class Mood:
     tonic: float
     layers: list[str] = field(default_factory=list)
     density: float = 0.6  # melody note probability per 8th note
+    icon: str = "🎵"
+    story: str = ""  # the real-life scenario, in plain words
+    template: str = "free"  # suggested composing method
 
 
 MOODS: dict[str, Mood] = {
-    "dawn": Mood("Dawn Chorus", "bhupali", 76, 220.0,
-                 ["bird", "droplet", "river", "wind"], 0.65),
-    "storm": Mood("Monsoon Storm", "bhairavi", 96, 196.0,
-                  ["droplet", "rain", "thunder", "wind", "fire"], 0.5),
-    "night": Mood("Calm Night", "yaman", 60, 233.08,
-                  ["cricket", "droplet", "river", "wind"], 0.45),
-    "campfire": Mood("Campfire", "minor", 84, 220.0,
-                     ["fire", "cricket", "droplet", "wind", "bird"], 0.55),
+    "dawn": Mood(
+        "Dawn Chorus", "bhupali", 76, 220.0, ["bird", "droplet", "river", "wind"], 0.65,
+        icon="🌅", template="rising_story",
+        story="First light. One bird starts singing, then the whole forest joins in."),
+    "storm": Mood(
+        "Monsoon Storm", "bhairavi", 96, 196.0,
+        ["bird", "droplet", "rain", "thunder", "wind", "fire"], 0.5,
+        icon="⛈️", template="rhythm_first",
+        story="Dark clouds roll in. Rain hammers the roof and thunder shakes the sky."),
+    "night": Mood(
+        "Calm Night", "yaman", 60, 233.08, ["bird", "cricket", "droplet", "river", "wind"], 0.45,
+        icon="🌙", template="alap",
+        story="A quiet evening. Crickets sing, a stream murmurs and the moon rises."),
+    "campfire": Mood(
+        "Campfire", "minor", 84, 220.0, ["fire", "cricket", "droplet", "wind", "bird"], 0.55,
+        icon="🔥", template="free",
+        story="Friends around a fire. Logs crackle and stories are told into the dark."),
+    "morning_walk": Mood(
+        "Morning Walk", "hamsadhwani", 88, 246.94, ["bird", "droplet", "wind", "river"], 0.7,
+        icon="🚶", template="call_response",
+        story="You stroll through a park at 6 a.m. Birds call to each other along the path."),
+    "rainy_window": Mood(
+        "Rainy Day Indoors", "desh", 66, 220.0, ["bird", "rain", "droplet", "wind"], 0.4,
+        icon="🌧️", template="alap",
+        story="You sit by the window with hot tea. Soft rain taps the glass and you feel nostalgic."),
+    "riverside": Mood(
+        "Riverside Meditation", "bhairav", 56, 196.0, ["river", "wind", "bird", "droplet"], 0.35,
+        icon="🧘", template="alap",
+        story="You sit on a river bank, breathe slowly and let your thoughts flow away."),
+    "bedtime": Mood(
+        "Bedtime Lullaby", "durga", 54, 261.63, ["bird", "cricket", "droplet", "wind", "river"], 0.35,
+        icon="😴", template="theme_var",
+        story="The lights are off. A gentle repeating tune rocks you to sleep."),
+    "festival": Mood(
+        "Village Festival", "kafi", 108, 220.0, ["bird", "droplet", "rain", "fire"], 0.75,
+        icon="🎉", template="rhythm_first",
+        story="Drums, lamps and dancing. The whole village celebrates till late night."),
+    "forest_trek": Mood(
+        "Forest Adventure", "major", 100, 261.63,
+        ["bird", "droplet", "river", "wind", "thunder"], 0.65,
+        icon="🥾", template="rising_story",
+        story="You hike deeper into the jungle. Every turn reveals a new sound."),
+    "missing_you": Mood(
+        "Missing Someone", "bageshri", 58, 233.08, ["droplet", "wind", "rain", "river", "bird"], 0.4,
+        icon="💔", template="call_response",
+        story="A long-distance longing. You ask a question into the night and hope for an answer."),
+    "study_focus": Mood(
+        "Study & Focus", "bhupali", 72, 261.63, ["droplet", "river", "bird"], 0.35,
+        icon="📚", template="theme_var",
+        story="Deep work time. A calm repeating pattern keeps your mind steady."),
+    "sunset": Mood(
+        "Sunset by the Sea", "marwa", 68, 174.61, ["droplet", "wind", "river", "bird"], 0.45,
+        icon="🌇", template="alap",
+        story="The sky turns orange and the day slowly lets go. Bittersweet and beautiful."),
 }
 
 

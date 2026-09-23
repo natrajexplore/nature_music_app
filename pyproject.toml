@@ -1,7 +1,7 @@
 [project]
 name = "nature-music-app"
 version = "0.1.0"
-description = "Add your description here"
+description = "Compose music from synthesized nature sounds with ragas, talas and chords, and learn music theory while you do it."
 readme = "README.md"
 authors = [
     { email = "natrajexplore@gmail.com" }
@@ -20,3 +20,13 @@ nature-music-app = "nature_music_app:main"
 [build-system]
 requires = ["uv_build>=0.12.13,<0.13.0"]
 build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "httpx>=0.28.1",
+    "pytest>=9.1.1",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+filterwarnings = ["ignore::DeprecationWarning"]

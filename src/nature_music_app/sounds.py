@@ -79,6 +79,40 @@ def thunder(rng: np.random.Generator, dur: float = 3.5) -> np.ndarray:
     return _norm(rumble * 3 + sub) * env
 
 
+# Tabla bols mapped to strokes: (bass "bayan" stroke, treble "dayan" stroke).
+BOLS = {
+    "Dha": ("open", "ring"), "Dhi": ("open", "ring"), "Dhin": ("open", "long"),
+    "Ge": ("bend", None), "Na": (None, "ring"), "Ta": (None, "ring"),
+    "Tin": (None, "long"), "Tu": (None, "long"), "Ti": (None, "click"),
+    "Ka": ("click", None), "Te": (None, "click"),
+}
+
+
+def log_drum(freq: float, rng: np.random.Generator, bol: str = "Dha") -> np.ndarray:
+    """Hollow log drum playing a tabla bol: a low booming 'bayan' and a tuned 'dayan'.
+
+    The treble stroke is tuned to `freq` (Sa) with tabla-like harmonic overtones.
+    """
+    t = _t(0.9)
+    bass, treble = BOLS.get(bol, ("open", "ring"))
+    x = np.zeros(t.size)
+    if bass in ("open", "bend"):
+        f0 = 95 * (1 + 0.35 * np.exp(-t / 0.03))
+        if bass == "bend":
+            f0 = f0 * (1 + 0.25 * (1 - np.exp(-t / 0.12)))
+        x += 0.9 * np.sin(2 * np.pi * np.cumsum(f0) / SR) * np.exp(-t / 0.28)
+    elif bass == "click":
+        x += 0.5 * _filt(rng.standard_normal(t.size), "bandpass", [150, 900]) * np.exp(-t / 0.015)
+    if treble in ("ring", "long"):
+        decay = 0.35 if treble == "long" else 0.18
+        tone = sum(a * np.sin(2 * np.pi * freq * h * t) for h, a in ((1, 1), (2, 0.5), (3, 0.3), (4, 0.15)))
+        x += 0.6 * tone * np.exp(-t / decay)
+        x += 0.3 * _filt(rng.standard_normal(t.size), "highpass", 2000) * np.exp(-t / 0.004)
+    elif treble == "click":
+        x += 0.5 * _filt(rng.standard_normal(t.size), "bandpass", [1500, 6000]) * np.exp(-t / 0.012)
+    return _norm(x) * np.minimum(t / 0.002, 1)
+
+
 def rain_bed(dur: float, rng: np.random.Generator) -> np.ndarray:
     """Continuous rain wash."""
     n = int(dur * SR)

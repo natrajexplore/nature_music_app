@@ -1,22 +1,22 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import "./App.css";
+import EarTraining from "./components/EarTraining";
+import Glossary from "./components/Glossary";
+import Learn from "./components/Learn";
+import Studio from "./components/Studio";
+import { API } from "./lib/api";
+import { stopAll } from "./lib/audio";
+import { load, save } from "./lib/store";
 
-const API = "http://localhost:8001";
-const ICONS = { bird: "🐦", droplet: "💧", cricket: "🦗", rain: "🌧️", fire: "🔥", thunder: "⚡", river: "🌊", wind: "🍃" };
-// The real instrument each nature sound acts like in the music.
-const LIKE = {
-  bird: ["🎷", "saxophone lead"], droplet: ["🎹", "piano chords"], cricket: ["🔔", "bells"],
-  rain: ["🥁", "hi-hat"], fire: ["🥁", "snare"], thunder: ["🥁", "bass drum"],
-  river: ["🎻", "cello drone"], wind: ["🎺", "horn section"],
-};
 const BAND = [["🎹", "Piano"], ["🎷", "Saxophone"], ["🥁", "Drums"], ["🎺", "Trumpet"], ["🎸", "Guitar"],
-  ["🎻", "Violin"], ["🪕", "Banjo"], ["🪗", "Accordion"], ["🎤", "Voice"], ["🎧", "Listen"]];
+  ["🎻", "Violin"], ["🪘", "Tabla"], ["🪗", "Accordion"], ["🎤", "Voice"], ["🎧", "Listen"]];
 const FLOATERS = ["♪", "♫", "♬", "𝄞", "♩", "♪", "♫", "𝄞", "♬", "♩"];
-
-// Semitone of each sargam note above Sa, used to light the piano keys.
-const SEMI = { Sa: 0, re: 1, Re: 2, ga: 3, Ga: 4, Ma: 5, "Ma#": 6, Pa: 7, dha: 8, Dha: 9, ni: 10, Ni: 11 };
-const WHITE = [0, 2, 4, 5, 7, 9, 11, 12];
-const BLACK = [[1, 0], [3, 1], [6, 3], [8, 4], [10, 5]]; // [semitone, white key on its left]
+const TABS = [
+  ["studio", "🎼 Studio", "Compose"],
+  ["learn", "📚 Learn", "10 lessons"],
+  ["ear", "👂 Ear training", "5 games"],
+  ["glossary", "📖 Glossary", "Terms A–Z"],
+];
 
 function Logo() {
   return (
@@ -30,91 +30,20 @@ function Logo() {
   );
 }
 
-function Piano({ notes }) {
-  const lit = { 12: "Sa" };
-  notes.forEach((n) => { lit[SEMI[n]] = n; });
-  return (
-    <div className="piano" role="img" aria-label={`Piano keys for ${notes.join(" ")}`}>
-      {WHITE.map((s) => (
-        <div key={s} className={lit[s] ? "wkey lit" : "wkey"}>{lit[s]}</div>
-      ))}
-      {BLACK.map(([s, i]) => (
-        <div key={s} className={lit[s] ? "bkey lit" : "bkey"} style={{ left: `${(i + 1) * 12.5 - 2.6}%` }}>
-          {lit[s]}
-        </div>
-      ))}
-    </div>
-  );
-}
-
 export default function App() {
   const [opts, setOpts] = useState(null);
-  const [mood, setMood] = useState("dawn");
-  const [raga, setRaga] = useState("bhupali");
-  const [template, setTemplate] = useState("free");
-  const [duration, setDuration] = useState(45);
-  const [layers, setLayers] = useState([]);
-  const [track, setTrack] = useState(null);
-  const [busy, setBusy] = useState(false);
-  const [playing, setPlaying] = useState(false);
   const [error, setError] = useState("");
-  const audioRef = useRef(null);
-  const previewRef = useRef(null);
+  const [tab, setTab] = useState(() => load("tab", "studio"));
+  const [keyName, setKeyName] = useState("A");
 
   useEffect(() => {
     fetch(`${API}/api/options`)
       .then((r) => r.json())
-      .then((o) => { setOpts(o); setLayers(o.moods.dawn.layers); })
-      .catch(() => setError("Backend not reachable. Run: uv run nature-music-app"));
+      .then(setOpts)
+      .catch(() => setError("Backend not reachable. Start it with: uv run nature-music-app"));
   }, []);
 
-  const pickMood = (key) => {
-    setMood(key);
-    setRaga(opts.moods[key].scale);
-    setLayers(opts.moods[key].layers);
-    setTemplate(opts.moods[key].template);
-  };
-
-  const toggle = (l) =>
-    setLayers((cur) => (cur.includes(l) ? cur.filter((x) => x !== l) : [...cur, l]));
-
-  const hear = (key, instrument) => {
-    previewRef.current?.pause();
-    previewRef.current = new Audio(`${API}/api/scale/${key}.wav?instrument=${instrument}`);
-    previewRef.current.play();
-  };
-
-  const stop = () => {
-    const a = audioRef.current;
-    if (a) {
-      a.pause();
-      a.currentTime = 0;
-    }
-  };
-
-  const compose = async () => {
-    previewRef.current?.pause();
-    setBusy(true);
-    setError("");
-    try {
-      const res = await fetch(`${API}/api/compose`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ mood, scale: raga, template, duration, layers }),
-      });
-      if (!res.ok) throw new Error((await res.json()).detail || "Compose failed");
-      setTrack(await res.json());
-      setTimeout(() => audioRef.current?.play(), 100);
-    } catch (e) {
-      setError(e.message);
-    } finally {
-      setBusy(false);
-    }
-  };
-
-  if (!opts) return <main><p className="error">{error || "Loading…"}</p></main>;
-
-  const tpl = opts.templates[template];
+  const go = (t) => { stopAll(); setTab(t); save("tab", t); };
 
   return (
     <>
@@ -130,7 +59,7 @@ export default function App() {
             <Logo />
             <h1>Nature Orchestra</h1>
           </div>
-          <p className="sub">Compose music from birds, rain, fire, river and wind, and learn how it works.</p>
+          <p className="sub">Compose with ragas, talas and chords played by birds, rain, rivers and wind, and learn how music works while you do it.</p>
           <div className="band" aria-hidden="true">
             {BAND.map(([e, name], i) => (
               <span key={name} title={name} style={{ animationDelay: `${i * 0.2}s` }}>{e}</span>
@@ -138,104 +67,26 @@ export default function App() {
           </div>
         </header>
 
-        <h2><span className="num">1</span> Pick a real-life scenario</h2>
-        <p className="help">Choose the moment you want music for. It sets a matching raga, tempo, instruments and method, which you can change below.</p>
-        <div className="cards scenarios">
-          {Object.entries(opts.moods).map(([k, m]) => (
-            <button key={k} className={mood === k ? "card scenario on" : "card scenario"} onClick={() => pickMood(k)}>
-              <span className="icon">{m.icon}</span>
-              <strong>{m.label}</strong>
-              <span className="desc">{m.story}</span>
-              <span className="meta">{opts.ragas[m.scale].name} · {m.bpm} bpm</span>
+        <nav className="tabs" aria-label="Sections">
+          {TABS.map(([k, label, sub]) => (
+            <button key={k} className={tab === k ? "tab on" : "tab"} onClick={() => go(k)} aria-current={tab === k}>
+              {label}<small>{sub}</small>
             </button>
           ))}
-        </div>
+        </nav>
 
-        <h2><span className="num">2</span> Pick a raga (the notes you can use)</h2>
-        <p className="help">{opts.sargam_help}</p>
-        <div className="cards">
-          {Object.entries(opts.ragas).map(([k, r]) => (
-            <div key={k} className={raga === k ? "card on" : "card"} onClick={() => setRaga(k)}>
-              <strong>🎼 {r.name}</strong>
-              <div className="notes">{r.notes.join(" ")}</div>
-              <div className="meta">{r.time} · {r.feeling}</div>
-              <div className="desc">{r.sound}</div>
-              <div className="row">
-                <button className="mini" onClick={(e) => { e.stopPropagation(); hear(k, "droplet"); }}>
-                  🎹 Hear scale
-                </button>
-                <button className="mini" onClick={(e) => { e.stopPropagation(); hear(k, "bird"); }}>
-                  🎷 Hear scale
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
-        <div className="piano-wrap">
-          <strong>🎹 {opts.ragas[raga].name} on a piano</strong>
-          <p className="help">Green keys are the notes of this raga. Sa is the home note (C).</p>
-          <Piano notes={opts.ragas[raga].notes} />
-        </div>
-
-        <h2><span className="num">3</span> Pick a composing method</h2>
-        <div className="row">
-          {Object.entries(opts.templates).map(([k, t]) => (
-            <button key={k} className={template === k ? "chip on" : "chip"} onClick={() => setTemplate(k)}>
-              {t.name}
-            </button>
-          ))}
-        </div>
-        <div className="callout">
-          <strong>🎶 {tpl.idea}</strong>
-          <ol>{tpl.steps.map((s) => <li key={s}>{s}</li>)}</ol>
-        </div>
-
-        <h2><span className="num">4</span> Choose nature instruments</h2>
-        <div className="row">
-          {Object.keys(opts.layers).map((l) => (
-            <button key={l} className={layers.includes(l) ? "chip tall on" : "chip tall"}
-                    title={opts.layers[l]} onClick={() => toggle(l)}>
-              <span>{ICONS[l]} {l}</span>
-              <small>acts like {LIKE[l][0]} {LIKE[l][1]}</small>
-            </button>
-          ))}
-        </div>
-        <p className="help">Tap an instrument to turn it on or off.</p>
-
-        <h2>⏱️ Length: {duration}s</h2>
-        <input type="range" min="15" max="120" step="5" value={duration}
-               onChange={(e) => setDuration(+e.target.value)} />
-
-        <button className="go" onClick={compose} disabled={busy || layers.length === 0}>
-          {busy ? "🎼 Composing…" : "🎵 Compose new music"}
-        </button>
-        {error && <p className="error">{error}</p>}
-
-        {track && (
-          <section className="player">
-            <div className="now">
-              <div className={playing ? "eq on" : "eq"} aria-hidden="true"><i /><i /><i /><i /><i /></div>
-              <p>
-                {opts.moods[track.mood].label} · {opts.ragas[track.scale].name} ·{" "}
-                {opts.templates[track.template].name} · {track.bpm} bpm · seed {track.seed}
-              </p>
-            </div>
-            <div className="controls">
-              <audio ref={audioRef} controls src={`${API}${track.url}`}
-                     onPlay={() => setPlaying(true)} onPause={() => setPlaying(false)}
-                     onEnded={() => setPlaying(false)} />
-              <button className="stop" onClick={stop} title="Stop and rewind to the start">⏹ Stop</button>
-            </div>
-            <a href={`${API}${track.url}`} download>⬇️ Download WAV</a>
-            <h3>🎧 What am I hearing?</h3>
-            {track.explain.map((x) => (
-              <div key={x.title} className="explain">
-                <strong>{x.title}</strong>
-                <p>{x.text}</p>
-              </div>
-            ))}
-          </section>
+        {!opts && <p className={error ? "error" : "help"}>{error || "Loading…"}</p>}
+        {opts && (
+          <>
+            <div hidden={tab !== "studio"}><Studio opts={opts} setKeyName={setKeyName} active={tab === "studio"} /></div>
+            {tab === "learn" && <Learn opts={opts} keyName={keyName} setKeyName={setKeyName} />}
+            {tab === "ear" && <EarTraining opts={opts} keyName={keyName} />}
+            {tab === "glossary" && <Glossary />}
+          </>
         )}
+        <footer className="foot">
+          All sounds are synthesized in code. Export MIDI to continue in GarageBand, FL Studio, Reaper, Ableton, Logic or MuseScore.
+        </footer>
       </main>
     </>
   );

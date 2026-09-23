@@ -50,9 +50,18 @@ TEMPLATES: dict[str, dict] = {
         "name": "Rhythm First",
         "idea": "Build the beat first, then add the melody on top.",
         "steps": [
-            "Rain and fire play a 3 + 3 + 2 beat pattern, strong on beats 1, 4 and 7 of 8.",
+            "Rain and fire play the tala's accent pattern (in Keherwa, a 3 + 3 + 2 groove).",
             "Melody and water drops join after the beat feels steady.",
             "River and wind arrive last to fill out the sound.",
+        ],
+    },
+    "raga_phrase": {
+        "name": "Raga Signature",
+        "idea": "The melody keeps coming back to the raga's catch phrase (pakad), like a classical singer does.",
+        "steps": [
+            "Every 4 bars start with the pakad, the short phrase that identifies the raga.",
+            "The next bars improvise freely, obeying the raga's up (aroha) and down (avaroha) rules.",
+            "Each improvisation ends on Sa, so you always feel the way home.",
         ],
     },
 }
@@ -66,4 +75,5 @@ LAYER_ROLES: dict[str, str] = {
     "thunder": "Bass: low rumble marks the start of a section",
     "river": "Drone: the flowing river hums the home note (Sa)",
     "wind": "Pad: wind sings the chord notes as a warm cloud",
+    "log": "Tala: a hollow log drum plays the tabla pattern (theka) of the rhythm cycle",
 }
